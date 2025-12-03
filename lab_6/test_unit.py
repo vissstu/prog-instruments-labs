@@ -62,4 +62,35 @@ def test_library_borrow_book():
     # Пытаемся выдать ту же книгу еще раз
     assert library.borrow_book("1984", "Петр Петров") == False
 
+# Параметризованный тест для проверки различных сценариев взятия книг
+@pytest.mark.parametrize("book_title, reader_name, expected_result, test_case", [
+    # Позитивный сценарий
+    ("Гарри Поттер", "Иван Иванов", True, "Нормальный случай"),
+
+    # Негативные сценарии
+    ("Несуществующая книга", "Иван Иванов", False, "Книга не найдена"),
+    ("", "Иван Иванов", False, "Пустое название"),
+])
+def test_borrow_book_parameterized(book_title, reader_name, expected_result, test_case):
+    """
+    Параметризованный тест для проверки взятия книг.
+    """
+    library = Library("Тестовая")
+
+    # Добавляем только существующие книги (кроме пустых и несуществующих)
+    if book_title.strip() and book_title != "Несуществующая книга":
+        library.add_book(book_title.strip(), "Автор")
+
+    # Пытаемся взять книгу
+    result = library.borrow_book(book_title, reader_name)
+
+    # Проверяем результат
+    assert result == expected_result, f"Тест '{test_case}' не прошел"
+
+    # Дополнительная проверка для успешных случаев
+    if expected_result and result:
+        book = library.find_book(book_title.strip())
+        if book:
+            assert book.is_borrowed == True
+
 
