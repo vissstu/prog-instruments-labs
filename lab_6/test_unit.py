@@ -94,3 +94,44 @@ def test_borrow_book_parameterized(book_title, reader_name, expected_result, tes
             assert book.is_borrowed == True
 
 
+@pytest.fixture
+def library_with_books():
+    """Фикстура для создания библиотеки с предустановленными книгами"""
+    library = Library("Фикстурная библиотека")
+    books = [
+        ("Книга 1", "Автор 1"),
+        ("Книга 2", "Автор 2"),
+        ("Книга 3", "Автор 3"),
+        ("Книга 4", "Автор 1"),  # Тот же автор, что и у Книги 1
+    ]
+    for title, author in books:
+        library.add_book(title, author)
+    return library
+
+
+# Тест с monkeypatch
+def test_monkeypatch_example():
+    """Тест с monkeypatch"""
+    library = Library("Тестовая")
+
+    # Создаем фальшивый метод для get_statistics
+    fake_called = False
+
+    def fake_statistics():
+        nonlocal fake_called
+        fake_called = True
+        return {"total": 0, "borrowed": 0, "available": 0}
+
+    # Сохраняем оригинальный метод
+    original_statistics = library.get_statistics
+
+    # Временно заменяем метод
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr(library, 'get_statistics', fake_statistics)
+
+        # Вызываем и проверяем
+        result = library.get_statistics()
+        assert result["total"] == 0
+        assert fake_called == True
+
+
