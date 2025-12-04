@@ -37,10 +37,15 @@ class OrderProcessor:
         self.data = []
 
     def process(self, items, customer_type, is_weekend, coupon_code=None):
-        # Calculate subtotal
-        subtotal = 0
-        for i in items:
-            subtotal += i['price'] * i['quantity']
+        # Создаем объекты
+        order_items = [OrderItem(item.get('name', ''), item['price'], item['quantity'])
+                       for item in items]
+        customer = Customer(customer_type)
+        order = Order(order_items, customer, coupon_code, is_weekend)
+
+        # Теперь работаем с объектами
+        subtotal = order.subtotal
+        customer_type = order.customer.type
 
         # Apply discounts based on customer type
         discount = 0
