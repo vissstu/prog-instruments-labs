@@ -13,7 +13,7 @@ def main():
     ]
 
     # Process order with various parameters
-    total = processor.process(
+    total = processor.calculate_order_total(
         items=items,  # Теперь это список OrderItem, не словарей
         customer_type="vip",
         is_weekend=True,

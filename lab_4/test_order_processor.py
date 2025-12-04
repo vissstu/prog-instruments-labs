@@ -11,7 +11,7 @@ class TestOrderProcessor(unittest.TestCase):
         ]
 
     def test_regular_customer(self):
-        total = self.processor.process(
+        total = self.processor.calculate_order_total(
             items=self.items,
             customer_type="regular",
             is_weekend=False
@@ -20,7 +20,7 @@ class TestOrderProcessor(unittest.TestCase):
         self.assertAlmostEqual(total, 270, delta=0.1)
 
     def test_vip_customer_with_discount(self):
-        total = self.processor.process(
+        total = self.processor.calculate_order_total(
             items=self.items,
             customer_type="vip",
             is_weekend=False
@@ -29,7 +29,7 @@ class TestOrderProcessor(unittest.TestCase):
         self.assertAlmostEqual(total, 256.5, delta=0.1)
 
     def test_with_coupon(self):
-        total = self.processor.process(
+        total = self.processor.calculate_order_total(
             items=self.items,
             customer_type="regular",
             is_weekend=False,

@@ -4,7 +4,7 @@ from models import *
 
 class OrderProcessor:
     def __init__(self):
-        self.data = []
+        self.order_history = []
 
     def _calculate_customer_discount(self, customer_type, subtotal):
         """Calculate discount based on customer type and order amount."""
@@ -34,7 +34,7 @@ class OrderProcessor:
 
         return 0.0
 
-    def process(self, items, customer_type, is_weekend, coupon_code=None):
+    def calculate_order_total(self, items, customer_type, is_weekend, coupon_code=None):
         # Создаем объекты
 
         customer = Customer(customer_type)
@@ -63,12 +63,12 @@ class OrderProcessor:
         total = subtotal - discount + tax
 
         # Log the transaction
-        self.data.append({
-            "sub": subtotal,
-            "dis": discount,
+        self.order_history.append({
+            "subtotal": subtotal,
+            "discount": discount,
             "tax": tax,
-            "tot": total,
-            "items": len(items)
+            "total": total,
+            "item_count": len(items)
         })
 
         # Check if we need to apply special offer
@@ -80,17 +80,17 @@ class OrderProcessor:
     def get_report(self):
         total_sales = 0
         total_discounts = 0
-        for d in self.data:
+        for d in self.order_history:
             total_sales += d['tot']
             total_discounts += d['dis']
 
-        avg = total_sales / len(self.data) if self.data else 0
+        avg = total_sales / len(self.order_history) if self.order_history else 0
 
         return f"Sales: {total_sales}, Discounts: {total_discounts}, Avg: {avg}"
 
     def find_big_orders(self, threshold):
         result = []
-        for d in self.data:
+        for d in self.order_history:
             if d['tot'] > threshold:
                 result.append(d)
         return result
