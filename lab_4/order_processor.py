@@ -20,6 +20,20 @@ class OrderProcessor:
                 return subtotal * Constants.REGULAR_DISCOUNT
         return 0.0
 
+    def _calculate_coupon_discount(self, coupon_code, subtotal):
+        """Calculate additional discount from coupon code."""
+        if not coupon_code:
+            return 0.0
+
+        if coupon_code == "SAVE10":
+            return subtotal * Constants.COUPON_SAVE10
+        elif coupon_code == "SAVE20":
+            return subtotal * Constants.COUPON_SAVE20
+        elif coupon_code == "FREESHIP":
+            return Constants.COUPON_FREESHIP
+
+        return 0.0
+
     def process(self, items, customer_type, is_weekend, coupon_code=None):
         # Создаем объекты
 
@@ -39,14 +53,8 @@ class OrderProcessor:
             subtotal = subtotal * (1 + Constants.WEEKEND_SURCHARGE_RATE)
 
         # Apply coupon if exists
-        if order.coupon_code:
-            if order.coupon_code == "SAVE10":
-                discount += subtotal * Constants.COUPON_SAVE10
-            elif order.coupon_code == "SAVE20":
-                discount += subtotal * Constants.COUPON_SAVE20
-            elif order.coupon_code == "FREESHIP":
-                # Free shipping logic (flat $10 discount)
-                discount += Constants.COUPON_FREESHIP
+        coupon_discount = self._calculate_coupon_discount(coupon_code, subtotal)
+        discount += coupon_discount
 
         # Calculate tax
         tax = (subtotal - discount) * Constants.TAX_RATE
