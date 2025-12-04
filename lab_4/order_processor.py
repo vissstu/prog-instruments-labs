@@ -6,6 +6,20 @@ class OrderProcessor:
     def __init__(self):
         self.data = []
 
+    def _calculate_customer_discount(self, customer_type, subtotal):
+        """Calculate discount based on customer type and order amount."""
+        if customer_type == "vip":
+            if subtotal > Constants.VIP_LARGE_THRESHOLD:
+                return subtotal * Constants.VIP_DISCOUNT_LARGE
+            elif subtotal > Constants.VIP_MEDIUM_THRESHOLD:
+                return subtotal * Constants.VIP_DISCOUNT_MEDIUM
+            else:
+                return subtotal * Constants.VIP_DISCOUNT_SMALL
+        elif customer_type == "regular":
+            if subtotal > Constants.REGULAR_DISCOUNT_THRESHOLD:
+                return subtotal * Constants.REGULAR_DISCOUNT
+        return 0.0
+
     def process(self, items, customer_type, is_weekend, coupon_code=None):
         # Создаем объекты
 
@@ -17,17 +31,8 @@ class OrderProcessor:
         customer_type = order.customer.type
 
         # Apply discounts based on customer type
-        discount = 0
-        if customer.is_vip:
-            if subtotal > Constants.VIP_LARGE_THRESHOLD:
-                discount = subtotal * Constants.VIP_DISCOUNT_LARGE
-            elif subtotal > Constants.VIP_MEDIUM_THRESHOLD:
-                discount = subtotal * Constants.VIP_DISCOUNT_MEDIUM
-            else:
-                discount = subtotal * Constants.VIP_DISCOUNT_SMALL
-        elif customer.is_regular:
-            if subtotal > Constants.REGULAR_DISCOUNT_THRESHOLD:
-                discount = subtotal * Constants.REGULAR_DISCOUNT
+        customer_discount = self._calculate_customer_discount(customer_type, subtotal)
+        discount = customer_discount
 
         # Weekend surcharge
         if is_weekend:
