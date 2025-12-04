@@ -1,13 +1,13 @@
 import unittest
-from order_processor import OrderProcessor
+from order_processor import *
 
 
 class TestOrderProcessor(unittest.TestCase):
     def setUp(self):
         self.processor = OrderProcessor()
         self.items = [
-            {"price": 100, "quantity": 2},
-            {"price": 50, "quantity": 1},
+            OrderItem("Test Item 1", 100, 2),  # Используем OrderItem вместо словаря
+            OrderItem("Test Item 2", 50, 1),
         ]
 
     def test_regular_customer(self):

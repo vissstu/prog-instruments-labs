@@ -1,3 +1,6 @@
+from constants import Constants
+
+
 class OrderItem:
     def __init__(self, name, price, quantity):
         self.name = name
@@ -38,10 +41,9 @@ class OrderProcessor:
 
     def process(self, items, customer_type, is_weekend, coupon_code=None):
         # Создаем объекты
-        order_items = [OrderItem(item.get('name', ''), item['price'], item['quantity'])
-                       for item in items]
+
         customer = Customer(customer_type)
-        order = Order(order_items, customer, coupon_code, is_weekend)
+        order = Order(items, customer, coupon_code, is_weekend)
 
         # Теперь работаем с объектами
         subtotal = order.subtotal
@@ -49,33 +51,33 @@ class OrderProcessor:
 
         # Apply discounts based on customer type
         discount = 0
-        if customer_type == "vip":
-            if subtotal > 1000:
-                discount = subtotal * 0.2
-            elif subtotal > 500:
-                discount = subtotal * 0.1
+        if customer.is_vip:
+            if subtotal > Constants.VIP_LARGE_THRESHOLD:
+                discount = subtotal * Constants.VIP_DISCOUNT_LARGE
+            elif subtotal > Constants.VIP_MEDIUM_THRESHOLD:
+                discount = subtotal * Constants.VIP_DISCOUNT_MEDIUM
             else:
-                discount = subtotal * 0.05
-        elif customer_type == "regular":
-            if subtotal > 500:
-                discount = subtotal * 0.05
+                discount = subtotal * Constants.VIP_DISCOUNT_SMALL
+        elif customer.is_regular:
+            if subtotal > Constants.REGULAR_DISCOUNT_THRESHOLD:
+                discount = subtotal * Constants.REGULAR_DISCOUNT
 
         # Weekend surcharge
         if is_weekend:
-            subtotal = subtotal * 1.1
+            subtotal = subtotal * (1 + Constants.WEEKEND_SURCHARGE_RATE)
 
         # Apply coupon if exists
-        if coupon_code:
-            if coupon_code == "SAVE10":
-                discount += subtotal * 0.1
-            elif coupon_code == "SAVE20":
-                discount += subtotal * 0.2
-            elif coupon_code == "FREESHIP":
+        if order.coupon_code:
+            if order.coupon_code == "SAVE10":
+                discount += subtotal * Constants.COUPON_SAVE10
+            elif order.coupon_code == "SAVE20":
+                discount += subtotal * Constants.COUPON_SAVE20
+            elif order.coupon_code == "FREESHIP":
                 # Free shipping logic (flat $10 discount)
-                discount += 10
+                discount += Constants.COUPON_FREESHIP
 
         # Calculate tax
-        tax = (subtotal - discount) * 0.08
+        tax = (subtotal - discount) * Constants.TAX_RATE
 
         # Calculate final total
         total = subtotal - discount + tax
@@ -90,8 +92,8 @@ class OrderProcessor:
         })
 
         # Check if we need to apply special offer
-        if len(items) > 5:
-            total = total * 0.95  # 5% discount for more than 5 items
+        if order.item_count > Constants.BULK_ITEM_THRESHOLD:
+            total = total * (1 - Constants.BULK_DISCOUNT)  # 5% discount for more than 5 items
 
         return total
 
@@ -112,3 +114,5 @@ class OrderProcessor:
             if d['tot'] > threshold:
                 result.append(d)
         return result
+
+
