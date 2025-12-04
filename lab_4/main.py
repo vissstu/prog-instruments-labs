@@ -1,4 +1,4 @@
-from order_processor import OrderProcessor
+from order_processor import *
 
 
 def main():
@@ -6,15 +6,15 @@ def main():
 
     # Sample order
     items = [
-        {"name": "Laptop", "price": 999.99, "quantity": 1},
-        {"name": "Mouse", "price": 29.99, "quantity": 2},
-        {"name": "Keyboard", "price": 79.99, "quantity": 1},
-        {"name": "Monitor", "price": 299.99, "quantity": 1},
+        OrderItem("Laptop", 999.99, 1),
+        OrderItem("Mouse", 29.99, 2),
+        OrderItem("Keyboard", 79.99, 1),
+        OrderItem("Monitor", 299.99, 1),
     ]
 
     # Process order with various parameters
     total = processor.process(
-        items=items,
+        items=items,  # Теперь это список OrderItem, не словарей
         customer_type="vip",
         is_weekend=True,
         coupon_code="SAVE10"
